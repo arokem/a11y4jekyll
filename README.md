@@ -285,7 +285,7 @@ Contributions are welcome! If you find accessibility issues or have suggestions 
 
 ## License
 
-This project is open source and available under the MIT License.
+This project is open source and available under the BSD 3-Clause License.
 
 ## Support
 
