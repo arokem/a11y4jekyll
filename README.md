@@ -200,6 +200,62 @@ Don't rely on color alone to convey information:
 - ✅ Print stylesheet
 - ✅ Valid HTML5 and CSS3
 
+## Deployment
+
+This template includes automated deployment via GitHub Actions.
+
+### GitHub Pages Deployment
+
+The template is configured to automatically deploy using GitHub Actions:
+
+#### Production Deployment (Main Branch)
+
+When you push to the `main` branch:
+1. The site is automatically built with Jekyll
+2. Deployed to GitHub Pages at your repository's GitHub Pages URL
+3. Available at: `https://[username].github.io/[repository-name]/`
+
+#### Preview Deployments (Feature Branches)
+
+When you push to any other branch:
+1. A preview version is built and deployed to a branch-specific directory
+2. Available at: `https://[username].github.io/[repository-name]/preview/[branch-name]/`
+3. A comment is added to your commit with the preview URL
+4. Preview deployments are retained for 30 days
+
+#### Setup Instructions
+
+1. **Enable GitHub Pages:**
+   - Go to your repository Settings → Pages
+   - Under "Source", select "GitHub Actions"
+
+2. **Enable GitHub Actions:**
+   - Go to your repository Settings → Actions → General
+   - Ensure "Allow all actions and reusable workflows" is selected
+   - Under "Workflow permissions", select "Read and write permissions"
+
+3. **Push to deploy:**
+   ```bash
+   git push origin main        # Deploy to production
+   git push origin feature     # Deploy preview
+   ```
+
+4. **For pull requests:**
+   - The workflow will build the site and comment on the PR
+   - Once the PR is merged or you push to the branch, the preview will be available
+
+### Manual Deployment
+
+You can also deploy manually:
+
+```bash
+# Build the site
+bundle exec jekyll build
+
+# The built site is in _site/
+# Upload the contents to your hosting provider
+```
+
 ## Resources
 
 - [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
