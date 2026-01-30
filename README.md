@@ -1,2 +1,298 @@
-# a11y4jekyll
-A template for a11y-compliant jekyll websites 
+# Accessible Jekyll Template (a11y4jekyll)
+
+A fully accessible Jekyll website template that complies with **WCAG 2.1 Level AA** standards and **Title II** requirements of the Americans with Disabilities Act (ADA).
+
+## Features
+
+### ✅ WCAG 2.1 Level AA Compliant
+
+- **Semantic HTML5 structure** with proper landmarks (header, nav, main, footer)
+- **ARIA labels and roles** for enhanced screen reader support
+- **Keyboard navigation** support with visible focus indicators
+- **Skip navigation link** for keyboard users to jump to main content
+- **Color contrast ratios** meeting 4.5:1 minimum (WCAG AA)
+- **Proper heading hierarchy** (h1-h6) for logical document structure
+- **Responsive design** that works on all devices and screen sizes
+- **Alternative text requirements** for all images
+- **Form accessibility** with proper labels and error handling
+- **Reduced motion support** for users with vestibular disorders
+- **High contrast mode support** for users with visual impairments
+
+### 📋 Title II ADA Requirements
+
+This template meets Title II requirements for public entities by ensuring:
+
+- Equal access to website content and functionality
+- Compatibility with assistive technologies (screen readers, keyboard-only navigation)
+- Clear and understandable content structure
+- Accessible forms and interactive elements
+- No barriers to information or services
+
+### 🎨 Accessible Design
+
+- High contrast color scheme with tested color combinations
+- Clear typography with appropriate line spacing
+- Responsive layout for mobile devices and tablets
+- Print stylesheet for accessible printed content
+- Focus indicators for all interactive elements
+
+## Quick Start
+
+### Prerequisites
+
+- Ruby (version 2.7 or higher)
+- RubyGems
+- GCC and Make
+
+### Installation
+
+1. **Clone the repository:**
+
+   ```bash
+   git clone https://github.com/arokem/a11y4jekyll.git
+   cd a11y4jekyll
+   ```
+
+2. **Install dependencies:**
+
+   ```bash
+   bundle install
+   ```
+
+3. **Run the development server:**
+
+   ```bash
+   bundle exec jekyll serve
+   ```
+
+4. **Open your browser:**
+
+   Visit `http://localhost:4000` to see your accessible website!
+
+## Usage
+
+### Creating Pages
+
+Create new pages by adding Markdown files to the root directory:
+
+```markdown
+---
+layout: page
+title: My New Page
+permalink: /my-page/
+---
+
+Your content here...
+```
+
+### Creating Blog Posts
+
+Add new blog posts to the `_posts` directory with the format `YYYY-MM-DD-title.md`:
+
+```markdown
+---
+layout: post
+title: "My Blog Post"
+date: 2026-01-30 12:00:00 -0500
+author: "Your Name"
+tags: [tag1, tag2]
+---
+
+Your post content here...
+```
+
+### Customization
+
+1. **Site Configuration:** Edit `_config.yml` to update site title, description, and other settings
+2. **Styles:** Modify `assets/css/main.css` to customize colors and layout
+3. **Navigation:** Update navigation links in `_layouts/default.html`
+4. **Content:** Edit `index.md`, `about.md`, and `blog.md` to match your needs
+
+## Accessibility Guidelines
+
+### Images
+
+Always include descriptive alt text:
+
+```html
+<!-- Good -->
+<img src="chart.png" alt="Bar chart showing 40% increase in sales">
+
+<!-- Decorative images -->
+<img src="decoration.png" alt="" role="presentation">
+```
+
+### Headings
+
+Maintain proper heading hierarchy:
+
+- Use only one h1 per page (page title)
+- Don't skip heading levels (h1 → h2 → h3, not h1 → h3)
+- Use headings for structure, not just styling
+
+### Links
+
+Make links descriptive:
+
+```html
+<!-- Good -->
+<a href="/report.pdf">Download the 2026 Annual Report (PDF, 2MB)</a>
+
+<!-- Bad -->
+<a href="/report.pdf">Click here</a>
+```
+
+### Color
+
+Don't rely on color alone to convey information:
+
+```html
+<!-- Good -->
+<span class="error" aria-label="Error">❌ Invalid email</span>
+
+<!-- Bad -->
+<span style="color: red;">Invalid email</span>
+```
+
+## Testing Accessibility
+
+### Automated Testing
+
+1. **WAVE:** https://wave.webaim.org/
+2. **axe DevTools:** Browser extension for Chrome/Firefox
+3. **Lighthouse:** Built into Chrome DevTools (Accessibility audit)
+
+### Manual Testing
+
+1. **Keyboard Navigation:**
+   - Tab through all interactive elements
+   - Ensure focus indicators are visible
+   - Test Enter and Space keys on buttons
+
+2. **Screen Reader:**
+   - Test with NVDA (Windows), JAWS (Windows), or VoiceOver (Mac)
+   - Verify all content is announced properly
+   - Check ARIA labels and landmarks
+
+3. **Zoom:**
+   - Test at 200% browser zoom
+   - Ensure no content is cut off or overlapping
+   - Verify text remains readable
+
+4. **Contrast:**
+   - Use WebAIM Contrast Checker: https://webaim.org/resources/contrastchecker/
+   - Verify all text meets 4.5:1 ratio (or 3:1 for large text)
+
+## Compliance Checklist
+
+- ✅ Semantic HTML5 structure
+- ✅ ARIA landmarks and labels
+- ✅ Keyboard navigation support
+- ✅ Skip navigation link
+- ✅ Focus indicators (3px outline)
+- ✅ Color contrast (4.5:1 minimum)
+- ✅ Proper heading hierarchy
+- ✅ Alternative text for images
+- ✅ Accessible forms with labels
+- ✅ Responsive design
+- ✅ Reduced motion support
+- ✅ High contrast mode support
+- ✅ Print stylesheet
+- ✅ Valid HTML5 and CSS3
+
+## Deployment
+
+This template includes automated deployment via GitHub Actions.
+
+### GitHub Pages Deployment
+
+The template is configured to automatically deploy using GitHub Actions:
+
+#### Production Deployment (Main Branch)
+
+When you push to the `main` branch:
+1. The site is automatically built with Jekyll
+2. Deployed to GitHub Pages
+3. Available at: `https://[username].github.io/[repository-name]/`
+
+#### Pull Request Preview Builds
+
+When you open a pull request:
+1. The site is automatically built with Jekyll
+2. Build artifact is uploaded and retained for 7 days
+3. A comment is added to the PR with:
+   - Build status
+   - Link to download the build artifact
+   - Instructions for local preview
+4. Once merged to `main`, changes are automatically deployed to production
+
+#### Setup Instructions
+
+1. **Enable GitHub Pages:**
+   - Go to your repository Settings → Pages
+   - Under "Source", select "GitHub Actions"
+
+2. **Enable GitHub Actions:**
+   - Go to your repository Settings → Actions → General
+   - Ensure "Allow all actions and reusable workflows" is selected
+
+3. **Deploy:**
+   ```bash
+   # Push to main for production deployment
+   git push origin main
+   
+   # Create PR for preview build
+   git checkout -b feature-branch
+   git push origin feature-branch
+   # Open PR on GitHub
+   ```
+
+4. **For pull requests:**
+   - The workflow will build the site and comment on the PR
+   - Download the artifact from the Actions tab to preview locally
+   - Once merged, the site deploys to production automatically
+
+### Manual Deployment
+
+You can also deploy manually:
+
+```bash
+# Build the site
+bundle exec jekyll build
+
+# The built site is in _site/
+# Upload the contents to your hosting provider
+```
+
+## Resources
+
+- [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
+- [Section 508 Standards](https://www.section508.gov/)
+- [ADA Title II Requirements](https://www.ada.gov/topics/title-ii/)
+- [WebAIM Resources](https://webaim.org/)
+- [A11Y Project](https://www.a11yproject.com/)
+- [Mozilla Accessibility Docs](https://developer.mozilla.org/en-US/docs/Web/Accessibility)
+
+## Contributing
+
+Contributions are welcome! If you find accessibility issues or have suggestions for improvements:
+
+1. Open an issue describing the problem
+2. Submit a pull request with your proposed changes
+3. Ensure your changes maintain WCAG 2.1 Level AA compliance
+
+## License
+
+This project is open source and available under the MIT License.
+
+## Support
+
+For questions or support:
+
+- Open an issue on GitHub
+- Review the accessibility resources listed above
+- Consult the WCAG 2.1 guidelines for specific requirements
+
+## Credits
+
+Created to promote web accessibility and compliance with WCAG and ADA standards.
