@@ -3,8 +3,8 @@ title: "Accessible Jekyll Template"
 description: "A WCAG 2.1 Level AA and Title II compliant Jekyll template"
 author: "Your Name"
 email: "your.email@example.com"
-baseurl: ""
-url: "https://example.com"
+baseurl: "/a11y4jekyll"
+url: "https://arokem.github.io"
 
 # Build settings
 markdown: kramdown
