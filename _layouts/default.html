@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: 'en' }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  
+  <title>{% if page.title %}{{ page.title | escape }} - {{ site.title | escape }}{% else %}{{ site.title | escape }}{% endif %}</title>
+  <meta name="description" content="{{ page.excerpt | default: site.description | strip_html | normalize_whitespace | truncate: 160 | escape }}">
+  
+  {% seo %}
+  {% feed_meta %}
+  
+  <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+  <link rel="canonical" href="{{ page.url | replace:'index.html','' | absolute_url }}">
+</head>
+<body>
+  <!-- Skip to main content link for keyboard navigation -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  
+  <!-- Header with site navigation -->
+  <header role="banner" class="site-header">
+    <div class="container">
+      <nav role="navigation" aria-label="Main navigation">
+        <a href="{{ '/' | relative_url }}" class="site-title">{{ site.title | escape }}</a>
+        
+        <ul class="nav-menu">
+          <li><a href="{{ '/' | relative_url }}" {% if page.url == "/" %}aria-current="page"{% endif %}>Home</a></li>
+          <li><a href="{{ '/about/' | relative_url }}" {% if page.url == "/about/" %}aria-current="page"{% endif %}>About</a></li>
+          <li><a href="{{ '/blog/' | relative_url }}" {% if page.url == "/blog/" %}aria-current="page"{% endif %}>Blog</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  
+  <!-- Main content area -->
+  <main id="main-content" role="main" class="main-content">
+    <div class="container">
+      {{ content }}
+    </div>
+  </main>
+  
+  <!-- Footer -->
+  <footer role="contentinfo" class="site-footer">
+    <div class="container">
+      <p>&copy; {{ 'now' | date: "%Y" }} {{ site.title | escape }}. All rights reserved.</p>
+      <p>This website is designed to be accessible and complies with <a href="https://www.w3.org/WAI/WCAG21/quickref/">WCAG 2.1 Level AA</a> standards.</p>
+      {% if site.email %}
+      <p>Contact: <a href="mailto:{{ site.email }}">{{ site.email }}</a></p>
+      {% endif %}
+    </div>
+  </footer>
+</body>
+</html>
