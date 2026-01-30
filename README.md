@@ -212,16 +212,19 @@ The template is configured to automatically deploy using GitHub Actions:
 
 When you push to the `main` branch:
 1. The site is automatically built with Jekyll
-2. Deployed to GitHub Pages at your repository's GitHub Pages URL
+2. Deployed to GitHub Pages
 3. Available at: `https://[username].github.io/[repository-name]/`
 
-#### Preview Deployments (Feature Branches)
+#### Pull Request Preview Builds
 
-When you push to any other branch:
-1. A preview version is built and deployed to a branch-specific directory
-2. Available at: `https://[username].github.io/[repository-name]/preview/[branch-name]/`
-3. A comment is added to your commit with the preview URL
-4. Preview deployments are retained for 30 days
+When you open a pull request:
+1. The site is automatically built with Jekyll
+2. Build artifact is uploaded and retained for 7 days
+3. A comment is added to the PR with:
+   - Build status
+   - Link to download the build artifact
+   - Instructions for local preview
+4. Once merged to `main`, changes are automatically deployed to production
 
 #### Setup Instructions
 
@@ -232,17 +235,22 @@ When you push to any other branch:
 2. **Enable GitHub Actions:**
    - Go to your repository Settings → Actions → General
    - Ensure "Allow all actions and reusable workflows" is selected
-   - Under "Workflow permissions", select "Read and write permissions"
 
-3. **Push to deploy:**
+3. **Deploy:**
    ```bash
-   git push origin main        # Deploy to production
-   git push origin feature     # Deploy preview
+   # Push to main for production deployment
+   git push origin main
+   
+   # Create PR for preview build
+   git checkout -b feature-branch
+   git push origin feature-branch
+   # Open PR on GitHub
    ```
 
 4. **For pull requests:**
    - The workflow will build the site and comment on the PR
-   - Once the PR is merged or you push to the branch, the preview will be available
+   - Download the artifact from the Actions tab to preview locally
+   - Once merged, the site deploys to production automatically
 
 ### Manual Deployment
 

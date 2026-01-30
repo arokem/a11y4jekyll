@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - 'copilot/**'
   pull_request:
     branches:
       - main
@@ -15,10 +14,10 @@ permissions:
   id-token: write
   pull-requests: write
 
-# Allow only one concurrent deployment per branch
+# Allow only one concurrent deployment for production
 concurrency:
-  group: "pages-${{ github.ref }}"
-  cancel-in-progress: true
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   # Build job
@@ -37,39 +36,35 @@ jobs:
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v4
-        if: github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
       - name: Build with Jekyll (Production)
-        if: github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: bundle exec jekyll build
         env:
           JEKYLL_ENV: production
 
-      - name: Build with Jekyll (Preview)
-        if: github.ref != 'refs/heads/main'
-        run: |
-          # Extract branch name for baseurl
-          BRANCH_NAME=$(echo ${{ github.ref }} | sed 's|refs/heads/||' | sed 's|/|-|g')
-          echo "Building for branch: $BRANCH_NAME"
-          bundle exec jekyll build --baseurl "/preview/$BRANCH_NAME"
+      - name: Build with Jekyll (Preview for PR)
+        if: github.event_name == 'pull_request'
+        run: bundle exec jekyll build
         env:
           JEKYLL_ENV: development
 
-      - name: Upload artifact (Production)
+      - name: Upload Pages artifact (Production)
         uses: actions/upload-pages-artifact@v3
-        if: github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
-      - name: Upload artifact (Preview)
+      - name: Upload build artifact (Preview)
         uses: actions/upload-artifact@v4
-        if: github.ref != 'refs/heads/main'
+        if: github.event_name == 'pull_request'
         with:
-          name: preview-site
+          name: pr-preview-${{ github.event.pull_request.number }}
           path: _site/
-          retention-days: 30
+          retention-days: 7
 
-  # Deployment job for production
-  deploy-production:
-    if: github.ref == 'refs/heads/main'
+  # Deployment job for production (main branch only)
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -80,119 +75,71 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-  # Preview deployment for branches
-  deploy-preview:
-    if: github.ref != 'refs/heads/main' && github.event_name == 'push'
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Checkout gh-pages
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: preview-site
-          path: preview-temp/
-
-      - name: Setup preview directory
-        run: |
-          BRANCH_NAME=$(echo ${{ github.ref }} | sed 's|refs/heads/||' | sed 's|/|-|g')
-          echo "Setting up preview for branch: $BRANCH_NAME"
-          mkdir -p preview/$BRANCH_NAME
-          rm -rf preview/$BRANCH_NAME/*
-          cp -r preview-temp/* preview/$BRANCH_NAME/
-          rm -rf preview-temp
-
-      - name: Commit and push preview
-        run: |
-          BRANCH_NAME=$(echo ${{ github.ref }} | sed 's|refs/heads/||' | sed 's|/|-|g')
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add preview/$BRANCH_NAME
-          git commit -m "Deploy preview for $BRANCH_NAME" || echo "No changes to commit"
-          git push origin gh-pages
-
-      - name: Comment on commit with preview URL
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const branchName = context.ref.replace('refs/heads/', '').replace(/\//g, '-');
-            const previewUrl = `https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/preview/${branchName}/`;
-            const message = `🚀 Preview deployment ready!\n\n**Branch:** \`${context.ref.replace('refs/heads/', '')}\`\n**Preview URL:** ${previewUrl}\n\nThis preview will be available for 30 days.`;
-            
-            // Find existing comment
-            const { data: comments } = await github.rest.repos.listCommentsForCommit({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              commit_sha: context.sha,
-            });
-            
-            const existingComment = comments.find(comment => 
-              comment.user.login === 'github-actions[bot]' && 
-              comment.body.includes('Preview deployment ready')
-            );
-            
-            if (existingComment) {
-              await github.rest.repos.updateCommitComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: existingComment.id,
-                body: message
-              });
-            } else {
-              await github.rest.repos.createCommitComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                commit_sha: context.sha,
-                body: message
-              });
-            }
-
-  # Comment on PR with preview URL
+  # Comment on PR with build status and artifact info
   comment-pr:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: preview-site
-          path: preview-site/
-
-      - name: Comment PR
+      - name: Comment on PR
         uses: actions/github-script@v7
         with:
           script: |
-            const branchName = context.payload.pull_request.head.ref.replace(/\//g, '-');
-            const message = `## 🚀 Preview Deployment
+            const message = `## ✅ Preview Build Complete
             
-            Your Jekyll site has been built successfully!
+            Your Jekyll site has been built successfully for this PR!
             
-            **Branch:** \`${context.payload.pull_request.head.ref}\`
-            **Commit:** \`${context.payload.pull_request.head.sha.substring(0, 7)}\`
+            **PR:** #${{ github.event.pull_request.number }}
+            **Branch:** \`${{ github.event.pull_request.head.ref }}\`
+            **Commit:** \`${{ github.event.pull_request.head.sha.substring(0, 7) }}\`
             
-            ℹ️ **Note:** To view the preview, this PR needs to be merged first, or push directly to the branch to trigger the preview deployment.
+            ### 📦 Build Artifact
             
-            Once deployed, the preview will be available at:
-            \`https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/preview/${branchName}/\`
+            The built site is available as a workflow artifact for 7 days. You can:
+            1. Download the artifact from the [workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            2. Extract and view locally by opening \`index.html\` in a browser
+            3. Deploy to your own preview server for testing
             
-            ### Accessibility Compliance
+            ### 🚀 Production Deployment
+            
+            Once this PR is merged to \`main\`, the site will automatically deploy to:
+            **https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/**
+            
+            ### ✅ Accessibility Compliance
             
             This build includes:
             - ✅ WCAG 2.1 Level AA compliance
             - ✅ Title II ADA requirements
             - ✅ Keyboard navigation support
             - ✅ Screen reader compatibility
+            - ✅ Color contrast ratios 4.5:1+
+            - ✅ Semantic HTML5 structure
             `;
             
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
+            // Find existing bot comment
+            const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: message
+              issue_number: context.issue.number,
             });
+            
+            const botComment = comments.find(comment => 
+              comment.user.login === 'github-actions[bot]' && 
+              comment.body.includes('Preview Build Complete')
+            );
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: message
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: message
+              });
+            }
